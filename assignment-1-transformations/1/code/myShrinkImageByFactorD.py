@@ -7,7 +7,7 @@ from numpy import zeros,zeros_like,array
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 
-def myShrinkImageByFactorD(d,cmap="inferno"):
+def myShrinkImageByFactorD(d,cmap="gray"):
     """
     d : List of 
     Shrink the image size by a factor of d along each dimension using image subsampling by
