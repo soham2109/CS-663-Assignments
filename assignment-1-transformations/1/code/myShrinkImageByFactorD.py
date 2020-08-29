@@ -1,10 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-import matplotlib as mpl
-
-from numpy import zeros,zeros_like,array
-from mpl_toolkits.axes_grid1 import ImageGrid
 
 
 def myShrinkImageByFactorD(d,cmap="gray"):
@@ -21,14 +17,6 @@ def myShrinkImageByFactorD(d,cmap="gray"):
     output_images = []
     
     width,height = input_image.shape
-    #height = input_image.shape[1]
-    
-    #fig,axes = plt.subplots(1,num_plots, constrained_layout=True, gridspec_kw={'width_ratios':[1,1,1]})
-    
-
-    #axes[0].imshow(input_image,cmap=cmap)
-    #axes[0].axis("on")
-    #axes[0].set_title("Original Image")
     count = 0
 
     for i in d:
@@ -41,13 +29,6 @@ def myShrinkImageByFactorD(d,cmap="gray"):
                 output[W][H] = input_image[W*i][H*i]
         
         output_images.append(output)
-
-        #im = axes[count].imshow(output, cmap=cmap)
-        #axes[count].axis("on")
-        #axes[count].set_title("Shrinked by size d="+str(i))
-
-    #cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    #plt.show()
     
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
@@ -61,9 +42,13 @@ def myShrinkImageByFactorD(d,cmap="gray"):
     for i in range(count):
         im = axes[i+1].imshow(output_images[i], cmap=cmap)
         axes[i+1].axis("on")
-        axes[i+1].set_title("Shrinked by size d="+str(d[i]))
+        axes[i+1].set_title("Shrinked by factor d="+str(d[i]))
 
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.35)
-    plt.savefig("../data/Shrinkage.png",bbox_inches="tight",pad=-1)
-
+    plt.savefig("../data/circleShrinked.png",bbox_inches="tight",pad=-1)
+    
+    for i in output_images:
+        plt.imsave("../data/Shrinkage"+str(d[output_images.index(i)]) +".png",i,cmap=cmap)
+    
+    
 myShrinkImageByFactorD([2,3])
