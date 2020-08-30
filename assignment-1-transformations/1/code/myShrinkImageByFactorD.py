@@ -17,7 +17,7 @@ def myShrinkImageByFactorD(input_file,d,cmap="gray"):
     Saves the shrinked image data in the ../data folder
     """
     
-    name = input_file.split("."[2]
+    name = input_file.split(".")[2]
     input_image = mpimg.imread(input_file,format="png")
     num_plots = len(d)+1
     

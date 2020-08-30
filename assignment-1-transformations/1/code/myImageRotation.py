@@ -35,9 +35,7 @@ def myImageRotation(input_file,angle,cmap="gray"):
                 bottom_right = input_image[r2][c1]
                 top_left = input_image[r1][c2]
                 top_right = input_image[r2][c2]
-                new_image[row][col] = bottom_right*(r\%1)*(1-(c\%1)) +
-                                     bottom_left*(1-r\%1)*(1-c\%1)+top_right*(r\%1)*(c\%1) +
-                                    top_left*(1-r\%1)*(c\%1)
+                new_image[row][col] = bottom_right*(r%1)*(1-(c%1)) + bottom_left*(1-r%1)*(1-c%1)+top_right*(r%1)*(c%1) + top_left*(1-r%1)*(c%1)
 
     fig,axes = plt.subplots(1,2, constrained_layout=True)
     axes[0].imshow(input_image,cmap="gray")

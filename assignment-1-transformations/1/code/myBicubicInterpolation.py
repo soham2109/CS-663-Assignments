@@ -53,7 +53,7 @@ def myBicubicInterpolation(input_file,row_ratio=3,col_ratio=2,cmap="gray",region
     name = input_file.split(".")[2]
     if len(region)!=0:
         input_image = input_image[region[0]:region[1],region[2]:region[3]]
-        name="data/region"
+        name="/data/region"
     
     rows,columns = input_image.shape
     new_cols = col_ratio*columns-1

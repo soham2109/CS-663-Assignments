@@ -21,7 +21,7 @@ def myBilinearInterpolation(input_file,cmap="gray",region=[]):
     
     if len(region)!=0:
         input_image = input_image[region[0]:region[1],region[2]:region[3]]
-        name="data/region"
+        name="/data/region"
     
     rows,columns = input_image.shape
     new_cols = 2*columns-1
