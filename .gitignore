@@ -1,3 +1,4 @@
 *.png
 *.m
 *-checkpoint.ipynb
+*.pyc
