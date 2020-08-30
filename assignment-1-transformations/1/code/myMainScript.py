@@ -1,24 +1,51 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import matplotlib as mpl
-from math import ceil,floor
-from numpy import zeros,zeros_like,array
-from mpl_toolkits.axes_grid1 import ImageGrid
-from numpy import c_
-
-input_file = "../data/barbaraSmall.png"
-input_image = mpimg.imread(input_file,format="png")*255
-
-from myBilinearInterpolation import *
+from myShrinkageImageByFactorD.py import *
 from myNearestNeighbourInterpolation import *
+from myBilinearInterpolation import *
 from myBicubicInterpolation import *
-from VisualizeDifferent import *
+from myImageRotation import *
 
-myShrinkImageByFactorD(input_image)
-myBilinearInterpolation(input_image)
-myNearestNeighbourInterpolation(input_image)
-myBicubicInterpolation(input_image)
-myImageRotation(input_image)
-visualize(input_image)
+from time import time
 
+circle_file = "../data/circle_concentric.png"
+D = [2,3]
+barbara_file = "../data/barbaraSmall.png"
+angle=30
+
+super_start = time()
+
+start = time()
+myShrinkageImageByFactorD(circle_file,D,cmap="gray")
+end = time()
+print("Time taken to run myShrinkageImageByFactorD.py :",end-start,"secs")
+
+start = time()
+myBilinearInterpolation(barbara_file,cmap="gray")
+end = time()
+print("Time taken to run myBilinearInterpolation.py :",end-start,"secs")
+
+start = time()
+myNearestNeighbourInterpolation(barbara_file,cmap="gray")
+end = time()
+print("Time taken to run myNearestNeighbourInterpolation.py :",end-start,"secs")
+
+start = time()
+myBicubicInterpolation(input_file,cmap="gray")
+end = time()
+print("Time taken to run myBicubicInterpolation.py :",end-start,"secs")
+
+# region test
+start = time()
+region = [50,80,50,80]
+myBilinearInterpolation(barbara_file,region=region,cmap="gray")
+myNearestNeighbourInterpolation(barbara_file,region=region,cmap="gray")
+myBicubicInterpolation(barbara_file,region=region,cmap="gray")
+end = time()
+print("Time taken to run region tests :",end-start,"secs")
+
+start = time()
+myImageRotation(barbara_file,angle,cmap="gray")
+end = time()
+print("Time taken to run myImageRotation.py :",end-start,"secs")
+
+super_end = time()
+print("Time taken to run all the scripts :",super_end-super_start,"secs")
