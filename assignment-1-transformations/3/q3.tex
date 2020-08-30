@@ -1,0 +1,132 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Question 3}
+\author{ }
+\date{August 2020}
+
+%\everymath{\displaystyle}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Problem Statement }
+
+Consider a (non-discrete) image I(x) with a continuous domain and real-
+valued intensities within [0, 1]. Let the image histogram be h(I), with mass
+1. Consider the histogram h(I) is split into two histograms (i) $h_1 (I)$ over the
+domain [0, a] and (ii) $h_2 (I)$ over the domain (a, 1], for some arbitrary $a \in (0,
+1)$. Assume that the histogram mass within [0, a] is $\alpha \in (0, 1)$
+
+\subsection{(8 points)}
+\textbf{(a)} Suppose you perform histogram equalization over the two intensity in-
+tervals [0, a] and (a, 1] separately, in a way that preserved the masses of the
+two histograms $h_1 (I)$ and $h_2 (I)$ after the transformation. Derive the mean
+intensity for the resulting histogram (or, equivalently, image) and include it
+in the report.
+
+\textbf{Given-}
+\begin{equation}
+\int\limits_0^1 h(I) \ dI =1 
+\end{equation}
+ 
+\begin{equation} \int\limits_0^a h_1(I) \ dI =\alpha = \int\limits_0^a h'_1(I) \ dI \end{equation} 
+\begin{equation} \int\limits_a^1 h_2(I) \ dI =1-\alpha = \int\limits_a^1 h'_2(I) \ dI \end{equation} 
+
+where $ \in (0, 1)$. In (1), (2) and, (3), h(I) represents the image
+histogram of the image I(x). h(I) is split into two histograms at an inten-
+sity $I_1 = a$ resulting in two new image histograms $h_1 (I)$ and $h_2 (I)$ over the
+domains [0, a] and (a, 1] respectively. $h'_1 (I)$ and $h'_2$  (I) are the transformed
+histograms after performing histogram equalization.
+
+\textbf{To find-} Mean intensity of the resulting histogram after transformation
+\begin{equation}E'[I] =  \int\limits_0^1 I h'(I) \ dI = \int\limits_0^a I h'_1(I) \ dI + \int\limits_a^1 I h'_2(I) \ dI = ?\end{equation}
+
+\textbf{Solution-}
+
+Let the histogram values after equalization be $h'_1$ and $h'_2$ respectively. Since after equalization, these values can be assumed to be constant,
+Using (2) and (3)
+\begin{equation} \int\limits_0^a h'_1(I) \ dI = h'_1 * I|_0^a = h'_1 * a = \alpha\end{equation}
+\begin{equation} \int\limits_a^1 h'_2(I) \ dI = h'_2 * I|_a^1 = h'_2 *(1-a) = 1-\alpha\end{equation}
+(5) and (6) give us relation between $h'_1$ , $h'_2$ , a and, $\alpha$. Using this relation
+with (4) we get:
+\begin{equation} \int\limits_0^a I h'_1(I) \ dI =\frac{h'_1 * I^2|_0^a}{2}= \frac{\alpha*\alpha}{2}\end{equation}
+\begin{equation} \int\limits_a^1 I h'_2(I) \ dI =\frac{h'_2 * I^2|_a^1}{2}=\frac{\frac{1-\alpha}{1-\alpha}*(1-a^2)}{2}= \frac{(1-\alpha)*(1-\alpha)}{2}\end{equation}
+
+Substituting values from (7) and (8) in (4) we get:
+
+\begin{equation}-E'[I] = \frac{\alpha*\alpha}{20}+\frac{(1-\alpha)*(1-\alpha)}{2}=\frac{a\alpha+1+a-\alpha-a\alpha}{2}=\frac{1+a-\alpha}{2}\end{equation}
+\subsection{(2 points)}
+\textbf{(b)} Let the chosen intensity a be the median intensity for the original his-
+togram h(I). Assume that the mean intensity for the original histogram h(I)
+is also a. Then, what is the mean intensity for the resulting histogram (or,
+equivalently, image). Show the derivations clearly in the report.
+
+\textbf{Given-}
+\begin{equation}\int\limits_0^a h(I) \ dI =\int\limits_a^1 h(I) \ dI = \frac{1}{2} \rightarrow \alpha = \frac{1}{2}\end{equation}
+\begin{equation}E[I] = \int\limits_0^1 I h(I) \ dI =a\end{equation}
+
+\textbf{To find-}
+\begin{equation}E'[I] = \int\limits_0^1 I h'(I) \ dI = \int\limits_0^a I h'_1(I) \ dI + \int\limits_a^1 Ih'_2(I) \ dI = ?\end{equation}
+
+\textbf{Solution-}
+\begin{equation}E'[I] = \frac{1+a-\frac{1}{2}}{2} = \frac{0.5+a}{2}\end{equation}
+
+\subsection{(5 points)}
+\textbf{(c)} Describe a scenario where the above described histogram-based intensity
+transform with a = $I_Median$ will do a better job in intensity transformation
+than a simple histogram equalization. Explain the reasons clearly.
+
+\textbf{Solution-}
+We apply the standard histogram equalization algorithm on the image
+histogram h(I) of the image I(x) with the following property:
+\begin{equation}\int\limits_0^1 h(I)\ dI = 1\end{equation}
+where the initial mean $E[I]$ is also taken to be as a. 
+
+Let the value of the transformed histogram $h’(I)$ after the standard equalization be $h’$ which is a constant.
+Then using conservation of mass,
+
+\begin{equation}\int\limits_0^1 h(I)\ dI = \int\limits_0^1 h'(I)\ dI = h'*I|_0^1 = 1 \rightarrow h' = 1\end{equation}
+
+Also,
+\begin{equation}E'[I] = \int\limits_0^1 I h'(I)\ dI = \int\limits_0^1 I*h'\ dI =\frac{I^2|_0^1}{2}=\frac{1}{2}\end{equation}
+
+The above result is independent of the components of the image. No mat-
+ter what the content of the image is, the mean after equalization is always
+going to be equal to $\frac{1}{2}$ .
+
+On the other hand if we perform the histogram equalization using the
+conditions given in \textbf{(b)} the results differ from (16). In this case the mean
+$E'[I]$ can be written as:
+
+\begin{equation}E'[I] = \frac{1+a-\alpha}{2}\end{equation}
+
+We want to minimize the distance between the initial mean a and final
+mean $E'[I]$ for which:
+
+\begin{equation}min\quad d(a,E'[I]) = min\quad|a-E'[I]| = min_{\alpha\in(0,1)} \quad|a-\frac{1+a-\alpha}{2}|\end{equation}
+
+which on optimizing results in $\alpha = \frac{1}{2}$ and thus concluding that a should
+be the median of the image histogram $h(I)$,
+
+\begin{equation}\int\limits_0^a h(I)\ dI = \alpha = \frac{1}{2}\end{equation}
+
+which takes the mean of the finally transformed image histogram closer
+to the initial mean a. In this case the mean value $E''[I]$ can be given as:
+
+\begin{equation}E''[I] = \frac{0.5+a}{2}\end{equation}
+
+This might be a good approach if we wish to keep the image’s overall
+brightness intact.
+
+\subsection{(10 points)}
+\textbf{(d)} Do an online search to find an image along the lines of your reasoning.
+Write a code for this intensity transformation and demonstrate the better
+performance on the image you obtained. Note that the better performance
+should be distinctly evident.
+
+\textbf{Solution-}
+\end{document}
+
