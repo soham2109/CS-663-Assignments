@@ -2,8 +2,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+from tqdm import tqdm
+from math import floor
 import cv2
+from seaborn import distplot
 
+def plot_hist(input_file,input_image,output_image):
+    """
+    input : input_file_path, input_image, output_image
+    output : saves the histograms for both the images for comparison
+    dependencies : seaborn, numpy, matplotlib
+    """
+    name = input_file.split(".")[2]
+    plt.figure()
+    plt.title("Normalized Histogram Plots for Images")
+    ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
+    ax = distplot(output_image,color="b",label ="Histogram Equalized Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
+    l1 = ax.lines[0]
+    x1 = l1.get_xydata()[:,0]
+    y1 = l1.get_xydata()[:,1]
+    ax.fill_between(x1,y1, color="red", alpha=0.3)
+    l2 = ax.lines[1]
+    x2 = l2.get_xydata()[:,0]
+    y2 = l2.get_xydata()[:,1]
+    ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.legend()
+    plt.savefig(".."+name+"HEHistogram.png",bbox_inches="tight",pad=-1)
+    
+    
 def truncateHE(array):
     """
     This function truncates the array values to check whether the values
@@ -41,11 +67,10 @@ def calculate_CDF(array,maximum,r,c):
 def myHE(input_file,cmap="gray"):
     """
     This is the Histogram Equalization Function.
-    input : the input image, cmap(optional)
+    input : the input image
     output : None
     Saves Histogram Equalized image
     """
-    
     ## SETTING FONT-SIZE FOR PLOTTING
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
@@ -66,28 +91,30 @@ def myHE(input_file,cmap="gray"):
         maximum = int(np.max(new_input))
         cum = calculate_CDF(new_input,maximum,r,c)
         
-        for i in range(r):
+        for i in tqdm(range(r)):
             for j in range(c):
                 new_image[i,j] = truncateHE(cum[int(new_input[i][j])]*maximum)
-         
-    ## For RGB, first convert to LAB and operate on L-channel and convert back to RGB
+        plot_hist(input_file,input_image,new_image)
+                
     else:
         input_image = cv2.cvtColor(input_image,cv2.COLOR_BGR2RGB)
-        image_lab = cv2.cvtColor(input_image,cv2.COLOR_RGB2LAB)
-        output_image = zeros_like(image_lab)
-        l,a,b = cv2.split(image_lab)
-        l_copy = l.copy()
-        maximum = int(np.max(l))
-        cum = calculate_CDF(l,maximum,r,c)
-        for i in range(r):
+        hsv_image = cv2.cvtColor(input_image,cv2.COLOR_RGB2HSV)
+        output_image = zeros_like(hsv_image)
+        h,s,v = cv2.split(hsv_image)
+        v_copy = v.copy()
+        maximum = int(np.max(v))
+        cum = calculate_CDF(v,maximum,r,c)
+        for i in tqdm(range(r)):
             for j in range(c):
-                l_copy[i,j] = truncateHE(cum[int(l[i,j])]*maximum)
+                v_copy[i,j] = truncateHE(cum[int(v[i,j])]*maximum)
                 
-        output_image[:,:,0] = l_copy
-        output_image[:,:,1] = a
-        output_image[:,:,2] = b
+        plot_hist(input_file,input_image,v_copy)
+                
+        output_image[:,:,2] = v_copy
+        output_image[:,:,0] = h
+        output_image[:,:,1] = s
         
-        output_image = cv2.cvtColor(output_image,cv2.COLOR_LAB2RGB)
+        output_image = cv2.cvtColor(output_image,cv2.COLOR_HSV2RGB)
         
         
     fig,axes = plt.subplots(1,2, constrained_layout=True)
@@ -102,17 +129,9 @@ def myHE(input_file,cmap="gray"):
     axes[1].set_title("Histogram Equalized")
     
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.35)
-
     plt.savefig(".."+name+"HistEq.png",bbox_inches="tight",pad=-1)
     
     if d==3:
         plt.imsave(".." + name+"HE.png",output_image)
     else:
         plt.imsave(".." + name+"HE.png",output_image,cmap=cmap)
-        
-        
-input_files = ["../data/chestXray.png","../data/barbara.png",
-               "../data/statueForegroundMasked.png","../data/church.png",
-               "../data/canyon.png","../data/TEM.png"]
-for i in input_files:
-    myHE(i)

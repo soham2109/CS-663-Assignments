@@ -1,25 +1,19 @@
-## INITIAL IMPORTS
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from time import time
+import matplotlib as mpl
+from tqdm import tqdm
+from math import floor
 import cv2
 
 
 def myForegroundMask(input_file,cmap="gray",offset=2):
-    """
-    inputs : <input_file_path>,offset or threshold value,cmap
-    outputs : None
-    
-    Saves the mask and the foreground masked images of the input image
-    depending on the threshold (or offset) value supplied.
-    """
-    parameters = {'axes.titlesize': 10}
-    plt.rcParams.update(parameters)
-    
     name = input_file.split(".")[2]
     input_image = cv2.imread(input_file,0)
     new_image = np.zeros_like(input_image)
+    
+    parameters = {'axes.titlesize': 10}
+    plt.rcParams.update(parameters)
     
     print(np.max(input_image))
     
@@ -48,13 +42,10 @@ def myForegroundMask(input_file,cmap="gray",offset=2):
     axes[2].set_title("Masked Image")
     
     
-    fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)   
+    fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)    
+    plt.show()
     plt.savefig(".."+name+"ForegroundMask.png",cmap=cmap,bbox_inches="tight",pad=-1)
     
-    cv2.imwrite(".." + name+"Mask.png",new_image)
+    plt.imsave(".." + name+"Mask.png",new_image,cmap=cmap)
     cv2.imwrite(".." + name+"ForegroundMasked.png",masked_image)
     
-
-    
-input_file = "../data/statue.png"
-myForegroundMask(input_file)

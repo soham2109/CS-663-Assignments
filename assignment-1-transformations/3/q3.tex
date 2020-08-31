@@ -6,7 +6,7 @@
 \date{August 2020}
 
 %\everymath{\displaystyle}
-
+\setcounter{section}{+2}
 
 \begin{document}
 
@@ -35,29 +35,22 @@ in the report.
 \begin{equation} \int\limits_0^a h_1(I) \ dI =\alpha = \int\limits_0^a h'_1(I) \ dI \end{equation} 
 \begin{equation} \int\limits_a^1 h_2(I) \ dI =1-\alpha = \int\limits_a^1 h'_2(I) \ dI \end{equation} 
 
-where $ \in (0, 1)$. In (1), (2) and, (3), h(I) represents the image
-histogram of the image I(x). h(I) is split into two histograms at an inten-
-sity $I_1 = a$ resulting in two new image histograms $h_1 (I)$ and $h_2 (I)$ over the
-domains [0, a] and (a, 1] respectively. $h'_1 (I)$ and $h'_2$  (I) are the transformed
-histograms after performing histogram equalization.
+where $\alpha$ $ \in (0, 1)$. In (1), (2) and, (3), h(I) represents the histogram of the image I(x). h(I) is split into two histograms at an intensity $I_1 = a$ resulting in two new image histograms $h_1 (I)$ and $h_2 (I)$. $h'_1 (I)$ and $h'_2$  (I) are the histograms after performing histogram equalization.
 
 \textbf{To find-} Mean intensity of the resulting histogram after transformation
+
 \begin{equation}E'[I] =  \int\limits_0^1 I h'(I) \ dI = \int\limits_0^a I h'_1(I) \ dI + \int\limits_a^1 I h'_2(I) \ dI = ?\end{equation}
 
 \textbf{Solution-}
 
 Let the histogram values after equalization be $h'_1$ and $h'_2$ respectively. Since after equalization, these values can be assumed to be constant,
-Using (2) and (3)
-\begin{equation} \int\limits_0^a h'_1(I) \ dI = h'_1 * I|_0^a = h'_1 * a = \alpha\end{equation}
-\begin{equation} \int\limits_a^1 h'_2(I) \ dI = h'_2 * I|_a^1 = h'_2 *(1-a) = 1-\alpha\end{equation}
-(5) and (6) give us relation between $h'_1$ , $h'_2$ , a and, $\alpha$. Using this relation
-with (4) we get:
-\begin{equation} \int\limits_0^a I h'_1(I) \ dI =\frac{h'_1 * I^2|_0^a}{2}= \frac{\alpha*\alpha}{2}\end{equation}
-\begin{equation} \int\limits_a^1 I h'_2(I) \ dI =\frac{h'_2 * I^2|_a^1}{2}=\frac{\frac{1-\alpha}{1-\alpha}*(1-a^2)}{2}= \frac{(1-\alpha)*(1-\alpha)}{2}\end{equation}
+Using (2) and (3) with (4) we get:
+\begin{equation} \int\limits_0^a I h'_1(I) \ dI =\frac{h'_1 * I^2|_0^a}{2}=\frac{\frac{\alpha}{a}*(a^2)}{2}  = \frac{a*\alpha}{2}\end{equation}
+\begin{equation} \int\limits_a^1 I h'_2(I) \ dI =\frac{h'_2 * I^2|_a^1}{2}=\frac{\frac{1-\alpha}{1-a}*(1-a^2)}{2}= \frac{(1+a)*(1-\alpha)}{2}\end{equation}
 
 Substituting values from (7) and (8) in (4) we get:
 
-\begin{equation}-E'[I] = \frac{\alpha*\alpha}{20}+\frac{(1-\alpha)*(1-\alpha)}{2}=\frac{a\alpha+1+a-\alpha-a\alpha}{2}=\frac{1+a-\alpha}{2}\end{equation}
+\begin{equation}E'[I] = \frac{a*\alpha}{2}+\frac{(1+a)*(1-\alpha)}{2}=\frac{a\alpha+1+a-\alpha-a\alpha}{2}=\frac{1+a-\alpha}{2}\end{equation}
 \subsection{(2 points)}
 \textbf{(b)} Let the chosen intensity a be the median intensity for the original his-
 togram h(I). Assume that the mean intensity for the original histogram h(I)
@@ -72,11 +65,11 @@ equivalently, image). Show the derivations clearly in the report.
 \begin{equation}E'[I] = \int\limits_0^1 I h'(I) \ dI = \int\limits_0^a I h'_1(I) \ dI + \int\limits_a^1 Ih'_2(I) \ dI = ?\end{equation}
 
 \textbf{Solution-}
-\begin{equation}E'[I] = \frac{1+a-\frac{1}{2}}{2} = \frac{0.5+a}{2}\end{equation}
+\begin{equation}E'[I] = \frac{1+a-\alpha}{2}|_{\alpha=1/2} = \frac{0.5+a}{2}\end{equation}
 
 \subsection{(5 points)}
 \textbf{(c)} Describe a scenario where the above described histogram-based intensity
-transform with a = $I_Median$ will do a better job in intensity transformation
+transform with a = $I_{Median}$ will do a better job in intensity transformation
 than a simple histogram equalization. Explain the reasons clearly.
 
 \textbf{Solution-}
@@ -98,7 +91,7 @@ ter what the content of the image is, the mean after equalization is always
 going to be equal to $\frac{1}{2}$ .
 
 On the other hand if we perform the histogram equalization using the
-conditions given in \textbf{(b)} the results differ from (16). In this case the mean
+conditions given in \textbf{(b)} the results differ from (14). In this case the mean
 $E'[I]$ can be written as:
 
 \begin{equation}E'[I] = \frac{1+a-\alpha}{2}\end{equation}

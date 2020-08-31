@@ -1,76 +1,112 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib as mpl
+
+from tqdm import tqdm
+import cv2
+from seaborn import distplot
+
+def plot_hist(input_file,input_image,output_image):
+    """
+    input : input_file_path, input_image, output_image
+    output : saves the histograms for both the images for comparison
+    dependencies : seaborn, numpy, matplotlib
+    """
+    name = input_file.split(".")[2]
+    plt.figure()
+    plt.title("Normalized Histogram Plots for Images")
+    ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
+    ax = distplot(output_image,color="b",label ="Contrast Stretched Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
+    l1 = ax.lines[0]
+    x1 = l1.get_xydata()[:,0]
+    y1 = l1.get_xydata()[:,1]
+    ax.fill_between(x1,y1, color="red", alpha=0.3)
+    l2 = ax.lines[1]
+    x2 = l2.get_xydata()[:,0]
+    y2 = l2.get_xydata()[:,1]
+    ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.legend()
+    plt.savefig(".."+name+"LCSHistogram.png",bbox_inches="tight",pad=-1)
+    
 
 def truncate(array):
+    """
+    input : array
+    output : truncated array to make it stay from 0 to 255
+    """
     r,c = array.shape
     for i in range(r):
         for j in range(c):
             if array[i][j]<0.0:
                 array[i][j] = 0
-            elif array[i][j]>1.0:
-                array[i][j]=1.0
+            elif array[i][j]>255.0:
+                array[i][j]=255.0
     return array
         
 
-def myLinearContrastStretching(input_file,tune=0.375,cmap="gray"):
-    
-    parameters = {'axes.titlesize': 10}
-    plt.rcParams.update(parameters)
-    
+def myLinearContrastStretching(input_file,x1=[0,255],x2=[0,255],cmap="gray"):
+    """
+    input : <input_file_path>, input_image_range(x1), output_image_range(x2), cmap(optional)
+    output : Saves the linear contrast stretched image
+    x1 : [r1,r2] (by default = [0,255])
+    x2 : [s1,s2] (by default = [0,255])
+    """
+    r1,r2 = x1
+    s1,s2 = x2
     name = input_file.split(".")[2]
-    input_image = mpimg.imread(input_file,format="png")
+    input_image = cv2.imread(input_file)
     d = 1
-    
     if len(input_image.shape)>2:
         r,c,d = input_image.shape
     else:
         r,c = input_image.shape
     
-    # for grayscale images
     if d==1:
-        tune = tune
-        minimum,maximum = 0,255
         new_image=np.zeros_like(input_image)
-        # min-max contrast stretching
-        for i in range (input_image.shape[0]):
-            for j in range(input_image.shape[1]):
-                input_pixel = input_image[i][j]
-                x= (input_pixel - minimum -tune)/(maximum-minimum)
-                new_image[i][j]=x*255
+        for i in tqdm(range(r)):
+            for j in range(c):
+                input_pixel = input_image[i,j]
+                if input_pixel<=r1:
+                    input_pixel = (s1/r1) * input_pixel
+                elif input_pixel>r1 and input_pixel <= r2:
+                    input_pixel = ((s2-s1)/(r2-r1))*(input_pixel-r1) + s1
+                else:
+                    input_pixel = ((255.0-s2)/(255.0-r2))*(input_pixel-r2) + s2
+                new_image[i][j]= input_pixel
         new_image = truncate(new_image)
-    
-    # for RGB images   
-    else:
-        minimum,maximum = 0,255
+        plot_hist(input_file,input_image,new_image)
         
-        f = 1.016*(1+tune)/(1.016-tune)
-        new_image=np.zeros_like(input_image)
-        for k in range(d):
-            new_image[:,:,k] = truncate((f*(input_image[:,:,k] - 0.5) + 0.5))
+    else:
+        input_image = cv2.cvtColor(input_image,cv2.COLOR_BGR2RGB)
+        hsv_image = cv2.cvtColor(input_image,cv2.COLOR_RGB2HSV)
+        h,s,v = cv2.split(hsv_image)
+        v_new = v.copy()
+        for i in tqdm(range(r)):
+            for j in range(c):
+                input_pixel = v[i,j]
+                if input_pixel<=r1:
+                    input_pixel = (s1/r1) * input_pixel
+                elif input_pixel>r1 and input_pixel <= r2:
+                    input_pixel = ((s2-s1)/(r2-r1))*(input_pixel-r1) + s1
+                else:
+                    input_pixel = ((255.0-s2)/(255.0-r2))*(input_pixel-r2) + s2
+                v_new[i,j]= input_pixel
+                
+        hsv_image[:,:,2] = v_new
+        plot_hist(input_file,v,v_new)
+        new_image = cv2.cvtColor(hsv_image,cv2.COLOR_HSV2RGB)
+        
 
     fig,axes = plt.subplots(1,2, constrained_layout=True)
-    # original image added to the subplot
     axes[0].imshow(input_image,cmap="gray")
     axes[0].axis("on")
     axes[0].set_title(r"Original Image")
-    # linear contrasted image added to the subplot
     im = axes[1].imshow(new_image,cmap="gray")
     axes[1].axis("on")
     axes[1].set_title(r"Linear Contrast Stretched Image")
-    # Adding the colorbar
+    
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
     plt.savefig(".."+name+"LCS.png",bbox_inches="tight",pad=-1)
     
-    # Saving only the contrasted image for better visualization
     plt.imsave(".." + name+"LinearContrastStretching.png",new_image,cmap=cmap)
-   
-
-
-input_files = ["../data/chestXray.png","../data/barbara.png",
-               "../data/statueForegroundMasked.png","../data/church.png",
-               "../data/canyon.png","../data/TEM.png"]
-offset_dict = {0: 0.025,1: 0.20, 2: 0.20, 3: -0.05, 4: 0.10, 5: 0.5}
-
-for i in input_files:
-    myLinearContrastStretching(i,offset_dict[input_files.index(i)])
