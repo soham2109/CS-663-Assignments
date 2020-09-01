@@ -163,5 +163,5 @@ def myHM(reference,reference_mask,target,target_mask):
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
     plt.savefig(".."+name+"HistogramMatched.png",cmap="gray",bbox_inches="tight",pad=-1)
     
-    plt.imsave(".." + name+"HM",target_image,cmap="gray")
+    plt.imsave(".." + name+"HM.png",target_image,cmap="gray")
     
