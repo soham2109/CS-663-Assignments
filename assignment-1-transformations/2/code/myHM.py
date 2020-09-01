@@ -33,7 +33,6 @@ def plot_hist(input_file,input_image,output_image,reference_image):
     x3 = l3.get_xydata()[:,0]
     y3 = l3.get_xydata()[:,1]
     ax.fill_between(x3,y3, color="green", alpha=0.3)
-    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
     plt.savefig("../images/"+name+"HMHistogram.png",bbox_inches="tight",pad=-1)
     
