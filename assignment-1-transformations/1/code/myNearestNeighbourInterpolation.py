@@ -12,12 +12,12 @@ def myNearestNeighbourInterpolation(input_file,cmap="gray",region=[]):
     output : None
     Saves the Nearest Neighbour interpolated images to the ../data folder.
     """
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = mpimg.imread(input_file,format="png")
     
     if len(region)!=0:
         input_image = input_image[region[0]:region[1],region[2]:region[3]]
-        name="/data/region"
+        name="region"
     
     # PLOTTING PARAMETERS
     parameters = {'axes.titlesize': 10}
@@ -50,6 +50,6 @@ def myNearestNeighbourInterpolation(input_file,cmap="gray",region=[]):
     axes[1].set_title("Nearest Neighbor Interpolated")
     
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"NearestNeighbor.png",cmap=cmap,bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"NearestNeighbor.png",cmap=cmap,bbox_inches="tight",pad=-1)
     
-    plt.imsave(".."+name+"NN.png",output,cmap=cmap)
+    plt.imsave("../images/"+name+"NN.png",output,cmap=cmap)

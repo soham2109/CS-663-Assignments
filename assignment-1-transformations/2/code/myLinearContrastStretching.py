@@ -13,9 +13,9 @@ def plot_hist(input_file,input_image,output_image):
     output : saves the histograms for both the images for comparison
     dependencies : seaborn, numpy, matplotlib
     """
-    name = input_file.split(".")[2]
-    plt.figure()
-    plt.title("Normalized Histogram Plots for Images")
+    name = input_file.split(".")[2].split("/")[2]
+
+    
     ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
     ax = distplot(output_image,color="b",label ="Contrast Stretched Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
     l1 = ax.lines[0]
@@ -26,8 +26,9 @@ def plot_hist(input_file,input_image,output_image):
     x2 = l2.get_xydata()[:,0]
     y2 = l2.get_xydata()[:,1]
     ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
-    plt.savefig(".."+name+"LCSHistogram.png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"LCSHistogram.png",bbox_inches="tight",pad=-1)
     
 
 def truncate(array):
@@ -58,7 +59,7 @@ def myLinearContrastStretching(input_file,x1=[0,255],x2=[0,255],cmap="gray"):
     
     r1,r2 = x1
     s1,s2 = x2
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = cv2.imread(input_file)
     d = 1
     if len(input_image.shape)>2:
@@ -111,6 +112,6 @@ def myLinearContrastStretching(input_file,x1=[0,255],x2=[0,255],cmap="gray"):
     axes[1].set_title(r"Linear Contrast Stretched Image")
     
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"LCS.png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"LCS.png",bbox_inches="tight",pad=-1)
     
-    plt.imsave(".." + name+"LinearContrastStretching.png",new_image,cmap=cmap)
+    plt.imsave("../images/" + name+"LinearContrastStretching.png",new_image,cmap=cmap)

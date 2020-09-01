@@ -8,7 +8,7 @@ import cv2
 
 
 def myForegroundMask(input_file,cmap="gray",offset=2):
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = cv2.imread(input_file,0)
     new_image = np.zeros_like(input_image)
     
@@ -43,9 +43,8 @@ def myForegroundMask(input_file,cmap="gray",offset=2):
     
     
     fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)    
-    plt.show()
-    plt.savefig(".."+name+"ForegroundMask.png",cmap=cmap,bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"ForegroundMask.png",cmap=cmap,bbox_inches="tight",pad=-1)
     
-    plt.imsave(".." + name+"Mask.png",new_image,cmap=cmap)
-    cv2.imwrite(".." + name+"ForegroundMasked.png",masked_image)
+    plt.imsave("../images/" + name+"Mask.png",new_image,cmap=cmap)
+    cv2.imwrite("../images/" + name+"ForegroundMasked.png",masked_image)
     

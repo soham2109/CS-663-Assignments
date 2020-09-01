@@ -10,10 +10,10 @@ def myBilinearInterpolation(input_file,cmap="gray",region=[]):
     """
     input = <input_file_path>,cmap(optional),region(optional)
     output = None
-    Saves the bilinear Interpolated image to the ../data folder
+    Saves the bilinear Interpolated image to the ../images folder
     """
     input_image = mpimg.imread(input_file,format="png")
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     
     # PLOTTING PARAMETERS
     parameters = {'axes.titlesize': 10}
@@ -21,7 +21,7 @@ def myBilinearInterpolation(input_file,cmap="gray",region=[]):
     
     if len(region)!=0:
         input_image = input_image[region[0]:region[1],region[2]:region[3]]
-        name="/data/region"
+        name="region"
     
     rows,columns = input_image.shape
     new_cols = 2*columns-1
@@ -58,8 +58,8 @@ def myBilinearInterpolation(input_file,cmap="gray",region=[]):
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
     
     # SAVING THE IMAGE WITH INTERPOLATED AND ORIGINAL
-    plt.savefig(".."+name+"BilinearInterpolation.png",cmap=cmap,bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"BilinearInterpolation.png",cmap=cmap,bbox_inches="tight",pad=-1)
     
     # SAVING THE INTERPOLATED IMAGE
-    plt.imsave(".."+name+"Bilinear.png",output,cmap=cmap)
+    plt.imsave("../images/"+name+"Bilinear.png",output,cmap=cmap)
             

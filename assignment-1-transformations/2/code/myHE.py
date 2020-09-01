@@ -14,9 +14,8 @@ def plot_hist(input_file,input_image,output_image):
     output : saves the histograms for both the images for comparison
     dependencies : seaborn, numpy, matplotlib
     """
-    name = input_file.split(".")[2]
-    plt.figure()
-    plt.title("Normalized Histogram Plots for Images")
+    name = input_file.split(".")[2].split("/")[2]
+    
     ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
     ax = distplot(output_image,color="b",label ="Histogram Equalized Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
     l1 = ax.lines[0]
@@ -27,8 +26,9 @@ def plot_hist(input_file,input_image,output_image):
     x2 = l2.get_xydata()[:,0]
     y2 = l2.get_xydata()[:,1]
     ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
-    plt.savefig(".."+name+"HEHistogram.png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"HEHistogram.png",bbox_inches="tight",pad=-1)
     
     
 def truncateHE(array):
@@ -76,7 +76,7 @@ def myHE(input_file,cmap="gray"):
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
     
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = cv2.imread(input_file)
     
     new_image = np.zeros_like(input_image)
@@ -133,6 +133,6 @@ def myHE(input_file,cmap="gray"):
     plt.savefig(".."+name+"HistEq.png",bbox_inches="tight",pad=-1)
     
     if d==3:
-        plt.imsave(".." + name+"HE.png",output_image)
+        plt.imsave("../images/" + name+"HE.png",output_image)
     else:
-        plt.imsave(".." + name+"HE.png",output_image,cmap=cmap)
+        plt.imsave("../images/" + name+"HE.png",output_image,cmap=cmap)

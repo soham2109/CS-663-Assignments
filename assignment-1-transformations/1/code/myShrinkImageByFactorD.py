@@ -17,7 +17,7 @@ def myShrinkImageByFactorD(input_file,d,cmap="gray"):
     Saves the shrinked image data in the ../data folder
     """
     
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = mpimg.imread(input_file,format="png")
     num_plots = len(d)+1
     
@@ -52,7 +52,7 @@ def myShrinkImageByFactorD(input_file,d,cmap="gray"):
         axes[count].set_title("Shrink by Factor"+str(i))
 
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"Shrink.png",bbox_inches="tight",pad=-1,cmap=cmap)
+    plt.savefig("../images/"+name+"Shrink.png",bbox_inches="tight",pad=-1,cmap=cmap)
     
     for i in range(len(d)):
-        plt.imsave(".."+name+"ShrinkByFactor"+str(d[i])+".png",output_images[i],cmap=cmap)
+        plt.imsave("../images/"+name+"ShrinkByFactor"+str(d[i])+".png",output_images[i],cmap=cmap)

@@ -8,7 +8,7 @@ from math import cos,sin,pi,floor,ceil
 
 def myImageRotation(input_file,angle,cmap="gray"):
     input_image = mpimg.imread(input_file,format="png")
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     
     theta = angle * pi/180
     translation_matrix = array([[cos(theta),-sin(theta)],[sin(theta),cos(theta)]])
@@ -47,8 +47,8 @@ def myImageRotation(input_file,angle,cmap="gray"):
     axes[1].set_title(r"Rotated Image by $30^{o}$")
 
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"RotateBy"+str(angle)+".png",cmap=cmap,bbox_inches="tight",pad=-1)
-    plt.imsave(".."+name+"Rotate.png",new_image,cmap=cmap)
+    plt.savefig("../images/"+name+"RotateBy"+str(angle)+".png",cmap=cmap,bbox_inches="tight",pad=-1)
+    plt.imsave("../images/"+name+"Rotate.png",new_image,cmap=cmap)
 
     
     

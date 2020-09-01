@@ -50,10 +50,10 @@ def myBicubicInterpolation(input_file,row_ratio=3,col_ratio=2,cmap="gray",region
     Saves the bi-cubic Interpolated image to the ../data folder
     """
     input_image = mpimg.imread(input_file,format="png")
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     if len(region)!=0:
         input_image = input_image[region[0]:region[1],region[2]:region[3]]
-        name="/data/region"
+        name="region"
     
     rows,columns = input_image.shape
     new_cols = col_ratio*columns-1
@@ -85,6 +85,6 @@ def myBicubicInterpolation(input_file,row_ratio=3,col_ratio=2,cmap="gray",region
     axes[1].set_title("Bicubic Interpolated")
     
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"BicubicInterpolated.png",cmap=cmap,bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"BicubicInterpolated.png",cmap=cmap,bbox_inches="tight",pad=-1)
     
-    plt.imsave(".."+name+"Bicubic.png",output,cmap=cmap)       
+    plt.imsave("../images/"+name+"Bicubic.png",output,cmap=cmap)       

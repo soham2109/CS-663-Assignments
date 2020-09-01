@@ -14,7 +14,7 @@ image5 = "../data/church.png"
 image6 = "../data/chestXray.png"
 image7 = "../data/statue.png"
 
-maskedStatue = "../data/statueForegroundMasked.png"
+maskedStatue = "../images/statueForegroundMasked.png"
 reference = "../data/retinaRef.png"
 reference_mask = "../data/retinaRefMask.png"
 target = "../data/retina.png"

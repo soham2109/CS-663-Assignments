@@ -9,9 +9,9 @@ def plot_hist(input_file,input_image,output_image):
     output : saves the histograms for both the images for comparison
     dependencies : seaborn, numpy, matplotlib
     """
-    name = input_file.split(".")[2]
-    plt.figure()
-    plt.title("Normalized Histogram Plots for Images")
+    name = input_file.split(".")[2].split("/")[2]
+    
+    
     ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
     ax = distplot(output_image,color="b",label ="BiHistogram Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
     l1 = ax.lines[0]
@@ -22,12 +22,13 @@ def plot_hist(input_file,input_image,output_image):
     x2 = l2.get_xydata()[:,0]
     y2 = l2.get_xydata()[:,1]
     ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
-    plt.savefig(".."+name+"BiHistHistogram.png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"BiHistHistogram.png",bbox_inches="tight",pad=-1)
 
 def mySubHE (input_file):
     
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     image = cv2.imread(input_file)
     image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
     
@@ -85,8 +86,8 @@ def mySubHE (input_file):
     plt.imshow(output_image,cmap="gray")
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
     
-    plt.savefig(".."+name+"SUBHEcombined.png",bbox_inches="tight",pad=-1)
-    plt.imsave(".." +name +"SUBHE.png",output_image,cmap="gray")
+    plt.savefig("../images/"+name+"SUBHEcombined.png",bbox_inches="tight",pad=-1)
+    plt.imsave("../images/" +name +"SUBHE.png",output_image,cmap="gray")
         
         
 def equalize(image,output_image,hist_,val1,val2):

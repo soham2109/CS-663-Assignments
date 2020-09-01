@@ -14,9 +14,9 @@ def plot_hist(input_file,input_image,output_image,reference_image):
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
     
-    name = input_file.split(".")[2]
-    plt.figure()
-    plt.title("Normalized Histogram Plots for Images")
+    name = input_file.split(".")[2].split("/")[2]
+    
+    
     ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
     ax = distplot(output_image,color="b",label ="Histogram Matched Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
     ax = distplot(reference_image,color='g',label ="Reference Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
@@ -33,8 +33,9 @@ def plot_hist(input_file,input_image,output_image,reference_image):
     x3 = l3.get_xydata()[:,0]
     y3 = l3.get_xydata()[:,1]
     ax.fill_between(x3,y3, color="green", alpha=0.3)
+    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
-    plt.savefig(".."+name+"HMHistogram.png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"HMHistogram.png",bbox_inches="tight",pad=-1)
     
 
 def perform_masking(original,masking,r,c,d=3):
@@ -45,18 +46,11 @@ def perform_masking(original,masking,r,c,d=3):
     """
     orig = original.copy()
     mask = masking.copy()
-    print(np.unique(mask))
-    plt.figure()
-    plt.subplot(1,2,1)
-    plt.imshow(orig)
     for i in range(3):
         for j in range(r):
             for k in range(c):
                 orig[j,k,i] = (0 if mask[j,k,i]==0 else orig[j,k,i])
-        
-        
-    plt.subplot(1,2,2)
-    plt.imshow(orig)
+
     return orig
 
 def calculate_CDF(array,maximum,r,c):
@@ -83,7 +77,7 @@ def calculate_CDF(array,maximum,r,c):
     return cum
 
 def myHM(reference,reference_mask,target,target_mask):
-    name = target.split(".")[2]
+    name = target.split(".")[2].split("/")[2]
     
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
@@ -161,7 +155,7 @@ def myHM(reference,reference_mask,target,target_mask):
     axes[2].axis("on")
     axes[2].set_title("Histogram Matched")
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    plt.savefig(".."+name+"HistogramMatched.png",cmap="gray",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"HistogramMatched.png",cmap="gray",bbox_inches="tight",pad=-1)
     
-    plt.imsave(".." + name+"HM.png",target_image,cmap="gray")
+    plt.imsave("../images/" + name+"HM.png",target_image,cmap="gray")
     

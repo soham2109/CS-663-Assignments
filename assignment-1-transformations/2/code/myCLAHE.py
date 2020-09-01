@@ -14,9 +14,9 @@ def plot_hist(input_file,input_image,output_image,window_x,threshold):
     output : saves the histograms for both the images for comparison
     dependencies : seaborn, numpy, matplotlib
     """
-    name = input_file.split(".")[2]
-    plt.figure()
-    plt.title("Normalized Histogram Plots for Images")
+    name = input_file.split(".")[2].split("/")[2]
+    #plt.figure()
+    #plt.title("Normalized Histogram Plots for Images")
     ax = distplot(input_image,color='r',label ="Input Histogram",hist_kws={"alpha": 0.3, "linewidth": 1.5},bins=256,hist=False)
     ax = distplot(output_image,color="b",label ="CLAHE Histogram",hist_kws={"alpha": 0.3,"linewidth": 1.5},bins=256,hist=False)
     l1 = ax.lines[0]
@@ -27,8 +27,9 @@ def plot_hist(input_file,input_image,output_image,window_x,threshold):
     x2 = l2.get_xydata()[:,0]
     y2 = l2.get_xydata()[:,1]
     ax.fill_between(x2,y2, color="blue", alpha=0.3)
+    plt.title("Normalized Histogram Plots for Images")
     plt.legend()
-    plt.savefig(".."+name+"CLAHEHistogram_"+str(window_x*2)+"_"+str(threshold)+".png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"CLAHEHistogram_"+str(window_x*2)+"_"+str(threshold)+".png",bbox_inches="tight",pad=-1)
     
 def imhist(input_array):
     m, n = input_array.shape
@@ -60,7 +61,7 @@ def myCLAHE(input_file,window_x,window_y,threshold,cmap="gray"):
     parameters = {'axes.titlesize': 10}
     plt.rcParams.update(parameters)
     
-    name = input_file.split(".")[2]
+    name = input_file.split(".")[2].split("/")[2]
     input_image = cv2.imread(input_file)
     output_image = np.zeros_like(input_image)
     d=1
@@ -124,6 +125,6 @@ def myCLAHE(input_file,window_x,window_y,threshold,cmap="gray"):
     axes[1].set_title("CLAHE Image")
     cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
     
-    plt.savefig(".."+name+"CLAHEcombined_"+str(window_x*2)+"_"+str(threshold)+".png",bbox_inches="tight",pad=-1)
+    plt.savefig("../images/"+name+"CLAHEcombined_"+str(window_x*2)+"_"+str(threshold)+".png",bbox_inches="tight",pad=-1)
 
-    plt.imsave(".." + name+"CLAHE"+str(window_x*2)+"_"+str(threshold)+".png",output_image,cmap=cmap)
+    plt.imsave("../images/" + name+"CLAHE"+str(window_x*2)+"_"+str(threshold)+".png",output_image,cmap=cmap)
