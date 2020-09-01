@@ -1,0 +1,8 @@
+The codes in each of the problems are written in Python3.8 using the following modules : 
+
+numpy (1.18.4)
+seaborn (0.10.1)
+matplotlib (3.2.1)
+opencv (4.2)
+tqdm (4.46.0)
+time

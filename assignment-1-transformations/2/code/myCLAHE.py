@@ -55,7 +55,11 @@ def calcCLAHEVal(input_array,th):
 
     return C
 
-def myCLAHE(input_file,window_x,window_y,threshold,cmap):
+def myCLAHE(input_file,window_x,window_y,threshold,cmap="gray"):
+    
+    parameters = {'axes.titlesize': 10}
+    plt.rcParams.update(parameters)
+    
     name = input_file.split(".")[2]
     input_image = cv2.imread(input_file)
     output_image = np.zeros_like(input_image)

@@ -7,7 +7,7 @@
 
 %\everymath{\displaystyle}
 \setcounter{section}{+2}
-
+\usepackage{amsmath}
 \begin{document}
 
 \maketitle
@@ -45,12 +45,23 @@ where $\alpha$ $ \in (0, 1)$. In (1), (2) and, (3), h(I) represents the histogra
 
 Let the histogram values after equalization be $h'_1$ and $h'_2$ respectively. Since after equalization, these values can be assumed to be constant,
 Using (2) and (3) with (4) we get:
-\begin{equation} \int\limits_0^a I h'_1(I) \ dI =\frac{h'_1 * I^2|_0^a}{2}=\frac{\frac{\alpha}{a}*(a^2)}{2}  = \frac{a*\alpha}{2}\end{equation}
-\begin{equation} \int\limits_a^1 I h'_2(I) \ dI =\frac{h'_2 * I^2|_a^1}{2}=\frac{\frac{1-\alpha}{1-a}*(1-a^2)}{2}= \frac{(1+a)*(1-\alpha)}{2}\end{equation}
 
-Substituting values from (7) and (8) in (4) we get:
+$\alpha = \int\limits_0^a h'_1(I) \ dI = h'_1\int\limits_0^a dI = h'_1*a$ \\
+So, $h'_1 = \frac{\alpha}{a}$ \\
+$1-\alpha = \int\limits_a^1 h'_2(I) \ dI = h'_2\int\limits_a^1 dI = h'_2*(1 - a)$ \\
+So, $h'_2 = \frac{1 -\alpha}{1 - a}$
+\begin{equation}
+\begin{split}
+E'[I] & = \int\limits_0^1 I h'(I) \ dI  \\
+      & = \int\limits_0^a I h'_1(I) \ dI + \int\limits_a^1 I h'_2(I) \ dI \\
+      & = \frac{h'_1 * I^2|_0^a}{2} + \frac{h'_2 * I^2|_a^1}{2} \\
+      & = \frac{\frac{\alpha}{a}*(a^2)}{2} + \frac{\frac{1-\alpha}{1-a}*(1-a^2)}{2} \\
+      & = \frac{a*\alpha}{2} + \frac{(1+a)*(1-\alpha)}{2} \\
+      & = \frac{a\alpha+1+a-\alpha-a\alpha}{2} \\
+      & = \frac{1+a-\alpha}{2}
+\end{split}
+\end{equation}
 
-\begin{equation}E'[I] = \frac{a*\alpha}{2}+\frac{(1+a)*(1-\alpha)}{2}=\frac{a\alpha+1+a-\alpha-a\alpha}{2}=\frac{1+a-\alpha}{2}\end{equation}
 \subsection{(2 points)}
 \textbf{(b)} Let the chosen intensity a be the median intensity for the original his-
 togram h(I). Assume that the mean intensity for the original histogram h(I)
@@ -86,32 +97,23 @@ Then using conservation of mass,
 Also,
 \begin{equation}E'[I] = \int\limits_0^1 I h'(I)\ dI = \int\limits_0^1 I*h'\ dI =\frac{I^2|_0^1}{2}=\frac{1}{2}\end{equation}
 
-The above result is independent of the components of the image. No mat-
-ter what the content of the image is, the mean after equalization is always
-going to be equal to $\frac{1}{2}$ .
+The mean after equalization is always going to be equal to $\frac{1}{2}$ independent of the image.
 
-On the other hand if we perform the histogram equalization using the
-conditions given in \textbf{(b)} the results differ from (14). In this case the mean
-$E'[I]$ can be written as:
+On the other hand, if we perform histogram equalization using the
+conditions given in \textbf{(b)} the results differ from (12). In this case the mean
+$E'[I]$ can be written as: $E'[I] = \frac{1+a-\alpha}{2}\ $
 
-\begin{equation}E'[I] = \frac{1+a-\alpha}{2}\end{equation}
-
-We want to minimize the distance between the initial mean a and final
-mean $E'[I]$ for which:
+To preserve the brightness of the image, we want to minimize the distance between the initial mean $a$ and final mean $E'[I]$ for which:
 
 \begin{equation}min\quad d(a,E'[I]) = min\quad|a-E'[I]| = min_{\alpha\in(0,1)} \quad|a-\frac{1+a-\alpha}{2}|\end{equation}
 
-which on optimizing results in $\alpha = \frac{1}{2}$ and thus concluding that a should
+which on optimizing, results in $ \alpha = \frac{1}{2}$ and thus concluding that $a $ should
 be the median of the image histogram $h(I)$,
 
 \begin{equation}\int\limits_0^a h(I)\ dI = \alpha = \frac{1}{2}\end{equation}
 
 which takes the mean of the finally transformed image histogram closer
-to the initial mean a. In this case the mean value $E''[I]$ can be given as:
-
-\begin{equation}E''[I] = \frac{0.5+a}{2}\end{equation}
-
-This might be a good approach if we wish to keep the image’s overall
+to the initial mean $ a $. In this case the mean value $E''[I]$ can be given from eq (9) to be  $ E''[I] = \frac{0.5+a}{2} $ . This might be a good approach if we wish to keep the image’s overall
 brightness intact.
 
 \subsection{(10 points)}

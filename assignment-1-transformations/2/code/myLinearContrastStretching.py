@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib as mpl
-
+from numpy import zeros_like
 from tqdm import tqdm
 import cv2
 from seaborn import distplot
@@ -52,6 +52,10 @@ def myLinearContrastStretching(input_file,x1=[0,255],x2=[0,255],cmap="gray"):
     x1 : [r1,r2] (by default = [0,255])
     x2 : [s1,s2] (by default = [0,255])
     """
+    
+    parameters = {'axes.titlesize': 10}
+    plt.rcParams.update(parameters)
+    
     r1,r2 = x1
     s1,s2 = x2
     name = input_file.split(".")[2]
