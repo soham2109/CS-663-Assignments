@@ -18,6 +18,7 @@ def im2double(im):
 	out = cv2.merge((out1,out2,out3))
 	return out
 
+
 img = im2double(img)
 gaussian_blur = cv2.GaussianBlur(img, (5,5), 1.0)
 shp = img.shape
