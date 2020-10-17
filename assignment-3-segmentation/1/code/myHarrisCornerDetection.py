@@ -88,11 +88,13 @@ def findCorners(filename, window_size_blur, sigma_weights, k, thresh):
     plt.figure()
     plt.imshow(dy,cmap='inferno',origin="lower")
     plt.title("Derivative along Y")
+    plt.colorbar()
     plt.savefig('../images/y_derivative.png',cmap='inferno',bbox_inches="tight")
     
     plt.figure()
     plt.imshow(dx,cmap='inferno',origin="lower")
     plt.title("Derivative along X")
+    plt.colorbar()
     plt.savefig('../images/x_derivative.png',cmap='inferno',bbox_inches="tight")
     
     cornerList = []
@@ -137,10 +139,10 @@ def plotCorners(finalImg,cornerList):
     plt.figure()
     plt.imshow(finalImg,cmap="gray",origin="lower")
     plt.colorbar()
-    plt.title("Corners on Images")
+    plt.title("Red Corners in Image")
     for i in cornerList:
         k,j,l = i
-        plt.scatter(k,j,color="g",s=0.2,marker="*")
+        plt.scatter(k,j,color="r",s=0.3,marker="*")
     plt.savefig('../images/Harris.png',bbox_inches='tight')
     
 def plotEigenValues(eigvalues):
