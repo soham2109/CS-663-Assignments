@@ -30,7 +30,7 @@ def im2double(im,d):
     return out
 
 def meanShift(filename,intensity_sigma=0.1,spatial_sigma=11.0,num_iter=30):
-    
+    print("Running Mean-Shift for file: ",filename) 
     img = cv2.imread(filename)
     img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     
