@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 def plot_and_save(output_image,input_image,filename):
     name = filename.rstrip("\n").split("/")[-1].split(".")[0]
     fig,axes = plt.subplots(1,2, constrained_layout=True)
-    axes[0].imshow(input_image,cmap=cmap)
+    axes[0].imshow(input_image)
     axes[0].axis("on")
     axes[0].set_title("Original Image")
     im = axes[1].imshow(output_image)
