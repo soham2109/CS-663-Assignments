@@ -119,4 +119,4 @@ def meanShift(filename,intensity_sigma=0.1,spatial_sigma=11.0,num_iter=30):
     
 if __name__=="__main__":
     filename = sys.argv[1]
-    meanShift = (filename)
+    meanShift(filename)
