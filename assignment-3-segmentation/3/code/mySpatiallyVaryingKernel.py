@@ -266,8 +266,8 @@ def all_functions(filename,threshold,alpha,distance_thresh):
     kern_size = lambda sigma: int(round(((sigma-0.8)/0.3+1)*2+1 )) if sigma >0.8 else 0
 
     alpha_orig = alpha
-    for k in [0.2,0.4,0.6,0.8,1]:
-        alpha = float(k*alpha_orig)
+    for factor in [0.2,0.4,0.6,0.8,1]:
+        alpha = float(factor*alpha_orig)
         for i in tqdm(range(r)):
             for j in range(c):
                 distance_min = 9999999
@@ -288,16 +288,16 @@ def all_functions(filename,threshold,alpha,distance_thresh):
         axes[0].set_title("Original Image")
         im = axes[1].imshow(gaussian_blurred)
         axes[1].axis("on")
-        axes[1].set_title("Blurred Image")
+        axes[1].set_title("Blurred Image alpha="+str(alpha))
         cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
         
-        plt.savefig("../images/"+filename+"_"+str(alpha)+"_background_blur.png",bbox_inches="tight",pad=-1)
+        plt.savefig("../images/"+filename+"_"+str(alpha)+"_"+str(factor)+"_background_blur.png",bbox_inches="tight",pad=-1)
 
         plt.figure()
         plt.imshow(masked_image_distance[:,:,0],cmap='jet')
         plt.axis("on")
-        plt.title("Variation with distance")
+        plt.title("Variation with distance alpha="+str(alpha))
         plt.colorbar()
-        plt.savefig("../images/"+filename+"_"+str(alpha)+"_distance.png",bbox_inches="tight",pad=-1)
+        plt.savefig("../images/"+filename+"_"+str(alpha)+"_"+str(factor)+"_distance.png",bbox_inches="tight",pad=-1)
 
 
