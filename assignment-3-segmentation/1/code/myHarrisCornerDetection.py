@@ -5,21 +5,38 @@ import h5py
 from tqdm import tqdm
 
 def normalize_image(image):
+    """Normalize the image to remain between 0-1
+    Take the image and use the Min-Max normalization criterion to normalize the images
+    
+    inputs: image(input image to be normalized)
+    outputs: normalized(normalized image)
+    """
     out = image.copy()
     normalized = (out-np.min(out))/(np.max(out)-np.min(out))
     return normalized
 
 def get_image(filename):
+    """Extract the image from mat file
+    inputs: filename(filepath of the .mat file)
+    outputs: the image as numpy array after normalizing
+    """
     f = h5py.File(filename,"r")
     out = f.get('imageOrig')
     out = np.array(out)
     return normalize_image(out)
 
 def dnorm(x,sigma,mu=0):
+    """Calculates the 1D Gaussian kernel
+    inputs: x(kernel position),sigma(standard deviation of the kernel),mu(optional, default=0)
+    outputs: 1D kernel
+    """
     return (1.0/(np.sqrt(2*np.pi)*sigma))*np.e**(-(((x - mu)/sigma)**2) / 2)
 
 def gaussian_kernel(ksize,sigma):
-    
+    """Calculates and returns 2D the Gaussian Kernel
+    inputs: ksize(Gaussian Kernel Size),sigma(standard deviation)
+    outputs: kernel_2D (2D gaussian kernel)
+    """    
     kernel_1D = np.linspace(-(ksize // 2), ksize // 2, ksize)
     for i in range(ksize):
         kernel_1D[i] = dnorm(kernel_1D[i], sigma=sigma)
@@ -32,6 +49,10 @@ def gaussian_kernel(ksize,sigma):
 
 
 def convolution(image,kernel_size,sigma):
+    """Performs Convolution of the image with a Gaussian kernel
+    inputs: image(input image),kernel_size(Gaussian kernel size),sigma(Gaussian Kernel Standard deviation)
+    outputs: output (convoluted image with the kernel)
+    """
     kernel = gaussian_kernel(kernel_size,sigma=sigma)
     image_row, image_col = image.shape
     kernel_row, kernel_col = kernel.shape
@@ -53,6 +74,12 @@ def convolution(image,kernel_size,sigma):
     return output
 
 def calculate_gradient(image):
+    """Calculate the image gradient
+    inputs: image (input image)
+    outputs: dy(gradient along Y),dx(gradient along X),
+             Ixx(square of gradient along X),Iyy(square of gradient along Y),
+             Ixy(product of the gradient along X and Y)
+    """
     dy, dx = np.gradient(image)
     Ixx = dx**2
     Ixy = dy*dx
@@ -60,6 +87,10 @@ def calculate_gradient(image):
     return (dy,dx,Ixx,Iyy,Ixy)
 
 def cornernessMeasure(Sxx,Syy,Sxy,k):
+    """Calculate the cornerness of the window
+    inputs: Sxx,Syy,Sxy,k(cornerness constant)
+    outputs: det(determinant of matrix),trace(trace of matrix),r(cornerness measure)
+    """
     det = (Sxx * Syy) - (Sxy**2)
     trace = Sxx + Syy
     r = det - k*(trace**2)
@@ -70,7 +101,8 @@ def findCorners(filename, window_size_blur, sigma_weights, k, thresh):
     Finds and returns list of corners and new image with corners drawn
     :param img: The original image
     :param window_size: The size (side length) of the sliding window
-    :param k: Harris corner constant. Usually 0.04 - 0.06
+    :param sigma_weights: Weight of Kernel
+    :param k: Harris corner constant. Usually 0.04-0.06 (0<k<0.24)
     :param thresh: The threshold above which a corner is counted
     :return:
     """
