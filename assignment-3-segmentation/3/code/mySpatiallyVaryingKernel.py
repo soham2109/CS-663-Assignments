@@ -115,18 +115,31 @@ def convolution(image, kernel_distances):
     
     plt.figure()
     plt.imshow(image/np.max(image))
-    
+    max_kernel_size = 0
+    max_kernel = 0
     padded_row,padded_col,_ = image.shape
     print(image.shape)
     
     for row in tqdm(range(padded_row)):
         for col in range(padded_col):
             
+            
+
             min_truncate = min(min(row,padded_row-row-1),min(col,padded_col-col-1))
             kernel_size = min(min_truncate,kern_size(kernel_distances[row,col,0]))
             
             if kernel_size!=0:
+                
+                kernel_for_output = gaussian_kernel(kern_size(kernel_distances[row,col,0]),sigma=kern_size(kernel_distances[row,col,0]))
+                
+                if kernel_distances[row,col,0]>max_kernel_size:
+                    max_kernel_size = kernel_distances[row,col,0]
+                    max_kernel = kernel_for_output
+
                 kernel = gaussian_kernel(kernel_size+2,sigma=kern_size(kernel_distances[row,col,0]))
+
+                
+  
                 #print(row,col,kernel.shape,row+kernel.shape[0])
                 for i in range(3):
                     output[row,col,i] = np.sum(kernel *image[row-kernel.shape[0]//2:row+kernel.shape[0]//2+1, col-kernel.shape[1]//2:col + kernel.shape[1]//2+1,i])
@@ -135,7 +148,7 @@ def convolution(image, kernel_distances):
                     output[row,col,i] = image[row,col,i]
                                          
             
-    return output
+    return output,max_kernel
 
 def mask(result2,resized_orig,threshold,distance_thresh):
 
@@ -280,8 +293,16 @@ def all_functions(filename,threshold,alpha,distance_thresh):
                     masked_image_distance[i,j,:] = alpha
 
 
-        gaussian_blurred = convolution(resized_image,masked_image_distance)
+        gaussian_blurred,max_kern = convolution(resized_image,masked_image_distance)
         
+        plt.figure()
+        plt.imshow(max_kern,cmap='gray')
+        plt.axis("on")
+        plt.title("Kernel for alpha="+str(alpha))
+        plt.colorbar()
+        plt.savefig("../images/"+filename+"_"+str(alpha)+"_"+str(factor)+"_kernel.png",bbox_inches="tight",pad=-1)
+        #plt.imshow("../images/"+filename+"_"+str(alpha)+"_"+str(factor)+"kernel.png",max_kern,cmap='gray')
+
         fig,axes = plt.subplots(1,2, constrained_layout=True)
         axes[0].imshow(resized_image)
         axes[0].axis("on")
