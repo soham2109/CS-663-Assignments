@@ -4,6 +4,9 @@ import sys,os
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from numpy import sqrt,e,power,linspace,outer,pi
+
+
+kern_size = lambda sigma: int(round(((sigma-0.8)/0.3+1)*2+1 )) if sigma >0.8 else 0
 def im2double(im,d):
     
     im1 = im[:,:,0]
@@ -206,7 +209,7 @@ def masked_image(masked_2,resized_orig,flag,threshold):
                         vectorized_mask[i,j]=0   
 
    
-    masked_img = np.zeros((result2.shape[0],result2.shape[1],3))
+    masked_img = np.zeros((resized_orig.shape[0],resized_orig.shape[1],3))
     masked_img[:,:,0] = resized_orig[:,:,0]*vectorized_mask
     masked_img[:,:,1] = resized_orig[:,:,1]*vectorized_mask
     masked_img[:,:,2] = resized_orig[:,:,2]*vectorized_mask
@@ -238,12 +241,12 @@ def plot_save(resized_image,vectorized_mask1,masked_img1,masked_img2,filename):
 
 
 
-if __name__=="__main__" : 
+def all_functions(filename,threshold,alpha,distance_thresh): 
 
-    filename = sys.argv[1]
-    threshold = float(sys.argv[2])
-    alpha = float(sys.argv[3])
-    distance_thresh = float(sys.argv[4])
+    #filename = sys.argv[1]
+    #threshold = float(sys.argv[2])
+    #alpha = float(sys.argv[3])
+    #distance_thresh = float(sys.argv[4])
 
     img = cv2.imread(filename) # Read image here
     img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
@@ -262,36 +265,39 @@ if __name__=="__main__" :
 
     kern_size = lambda sigma: int(round(((sigma-0.8)/0.3+1)*2+1 )) if sigma >0.8 else 0
 
-    for i in tqdm(range(r)):
-        for j in range(c):
-            distance_min = 9999999
-            for k in foreground_pixels1:
-                if ((i-k[0])**2+(j-k[1])**2)<distance_min**2:
-                    distance_min = np.sqrt((i-k[0])**2+(j-k[1])**2)
-                    masked_image_distance[i,j,:] = distance_min
-                    
-            if distance_min>=alpha:
-                masked_image_distance[i,j,:] = alpha
+    alpha_orig = alpha
+    for k in [0.2,0.4,0.6,0.8,1]:
+        alpha = float(k*alpha_orig)
+        for i in tqdm(range(r)):
+            for j in range(c):
+                distance_min = 9999999
+                for k in foreground_pixels1:
+                    if ((i-k[0])**2+(j-k[1])**2)<distance_min**2:
+                        distance_min = np.sqrt((i-k[0])**2+(j-k[1])**2)
+                        masked_image_distance[i,j,:] = distance_min
+                        
+                if distance_min>=alpha:
+                    masked_image_distance[i,j,:] = alpha
 
 
-    gaussian_blurred = convolution(resized_image,masked_image_distance)
-    
-    fig,axes = plt.subplots(1,2, constrained_layout=True)
-    axes[0].imshow(resized_image)
-    axes[0].axis("on")
-    axes[0].set_title("Original Image")
-    im = axes[1].imshow(gaussian_blurred)
-    axes[1].axis("on")
-    axes[1].set_title("Blurred Image")
-    cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
-    
-    plt.savefig("../images/"+filename+"_"+str(alpha)+"_"+"background_blur.png",bbox_inches="tight",pad=-1)
+        gaussian_blurred = convolution(resized_image,masked_image_distance)
+        
+        fig,axes = plt.subplots(1,2, constrained_layout=True)
+        axes[0].imshow(resized_image)
+        axes[0].axis("on")
+        axes[0].set_title("Original Image")
+        im = axes[1].imshow(gaussian_blurred)
+        axes[1].axis("on")
+        axes[1].set_title("Blurred Image")
+        cbar = fig.colorbar(im,ax=axes.ravel().tolist(),shrink=0.45)
+        
+        plt.savefig("../images/"+filename+"_"+str(alpha)+"_background_blur.png",bbox_inches="tight",pad=-1)
 
-    plt.figure()
-    plt.imshow(masked_image_distance[:,:,0],cmap='jet')
-    plt.axis("on")
-    plt.title("Variation with distance")
-    plt.colorbar()
-    plt.savefig("../images/"+filename+"_"+str(alpha)+"_"+"distance.png",bbox_inches="tight",pad=-1)
+        plt.figure()
+        plt.imshow(masked_image_distance[:,:,0],cmap='jet')
+        plt.axis("on")
+        plt.title("Variation with distance")
+        plt.colorbar()
+        plt.savefig("../images/"+filename+"_"+str(alpha)+"_distance.png",bbox_inches="tight",pad=-1)
 
 
