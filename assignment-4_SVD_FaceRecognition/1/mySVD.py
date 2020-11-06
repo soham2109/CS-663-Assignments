@@ -1,8 +1,13 @@
 import numpy as np
 
 def SVD(matrix):
+    """Calculates SVD using eigen value decomposition method and 
+        returns the U,S,V_T
+    :param matrix: any random matrix
+    :output U,S,V_T : the singular value components
+    """
     # calculating A'A
-    temp1 = np.matmul(random_matrix.T,random_matrix)
+    temp1 = np.matmul(matrix.T,matrix)
     # calculating eigen values and vectors of A'A
     lambda_,V = np.linalg.eig(temp1)
  
@@ -16,7 +21,7 @@ def SVD(matrix):
     for i in range(c):
         V_sort[:,i] = V[:,idx[i]]
 
-    U_sort = np.matmul(random_matrix,V_sort)
+    U_sort = np.matmul(matrix,V_sort)
     _,c = U_sort.shape
     for i in range(c):
         U_sort[:,i] = U_sort[:,i]/np.sqrt(np.sum(np.square(U_sort[:,i])))
