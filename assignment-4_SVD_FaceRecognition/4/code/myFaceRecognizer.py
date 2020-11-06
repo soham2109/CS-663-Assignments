@@ -230,7 +230,7 @@ def ORL_data(path, subjects, train_images_per_subject, test_images_per_subject, 
     unitary_vectors = calculate_svd(train_mean_subtracted)
     alpha_svd_train, alpha_svd_test = calculate_alpha(unitary_vectors, train_mean_subtracted, test_mean_subtracted)
     calculate_and_plot_prediction_rates(train_images_per_subject,test_images_per_subject, \
-                                        alpha_eig_train, alpha_eig_test, ks,dataset="ORL",method="svd")
+                                        alpha_svd_train, alpha_svd_test, ks,dataset="ORL",method="svd")
 
 
 def YALE_data(path, train_images_per_subject, test_images_per_subject, ks):

@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import os
-import cv2
 import matplotlib.pyplot as plt
 import sys
 
@@ -103,8 +102,11 @@ def reconstruct_eigen_faces(ks, alpha, V, train_mean):
     plt.savefig("../images/ReconstructionPlot_k.png",bbox_inches="tight")
     
 def plot_top_25_eigen_vectors(V):
+    """Plot the top 25 eigen vectors
+    :param V: unitary vector
+    """
     plt.figure(figsize=(30,30))
-    plt.suptitle("Eigen Vectors as Images",fontsize=50)
+    plt.suptitle("Eigen Vectors as Images",fontsize=30)
     for i in range(25):
         plt.subplot(5,5,i+1)
         plt.imshow(V[:,i].reshape(112,92),cmap="gray")
