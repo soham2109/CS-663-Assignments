@@ -158,21 +158,15 @@ def cross_validate(array,num):
             
             # SVD 
             U,sigma,V_T = np.linalg.svd(train_images.T,full_matrices=False)
-            #print(U.shape)
             U = normalize_vector(U)
             
             alpha_svd =np.matmul(U.T,train_images.T)
-            #print("Shape of alpha ",alpha_svd.shape)
             alpha_svd_test = np.matmul(U.T,test_image.T)
-            #print("Shape of alpha_test ",alpha_svd_test.shape)
-            
-            
+                    
             squared_error += np.sum(np.square(alpha_svd[:,3:]- alpha_svd_test[3:]))
-#             if squared_error>max_error:
-#                 max_error = squared_error
         
         error[i//num] = squared_error/6
-        # error[i//num] = max_error
+
         
     return error
 
@@ -230,10 +224,6 @@ def ORL_data(path, subjects, train_images_per_subject, test_images_per_subject, 
     train_mean = find_mean(train_images)
     train_mean_subtracted, test_mean_subtracted = subtract_mean(train_mean, train_images, test_images)
     eigen_vectors = calculate_svd(train_mean_subtracted)
-
-    #alpha_eig_train, alpha_eig_test = calculate_alpha(eigen_vectors, train_mean_subtracted, test_mean_subtracted)
-    # calculate_and_plot_prediction_rates(train_images_per_subject,test_images_per_subject, \
-    #                                     alpha_eig_train, alpha_eig_test, ks,dataset="ORL",method="eig")
     unitary_vectors = calculate_svd(train_mean_subtracted)
     alpha_svd_train, alpha_svd_test = calculate_alpha(unitary_vectors, train_mean_subtracted, test_mean_subtracted)
     calculate_and_plot_prediction_rates(train_images_per_subject,test_images_per_subject, \
@@ -248,7 +238,7 @@ if __name__=="__main__":
     print("For ORL Dataset :")
     print("ks :",ORL_k)
     ORL_data(ORL_PATH,subjects=32,train_images_per_subject=6,test_images_per_subject=4,ks=ORL_k)
-    print("***************************************************")
+
 
       
     
