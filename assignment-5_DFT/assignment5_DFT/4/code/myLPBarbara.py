@@ -72,7 +72,12 @@ def multiply(fname, image, filterKernel, ktype, D ,verbose=True):
     """
     name = fname.split("/")[-1].split(".")[0]
     fft_image = np.fft.fftshift(np.fft.fft2(image)) 
-    mult = fft_image * filterKernel
+    mult_full = fft_image * filterKernel
+    r,c = mult_full.shape
+    #print("Shape Before : ",mult_full.shape)
+    center = (r//2, c//2)
+    mult = mult_full[center[0] - r//4:center[0] + r//4, center[1]-c//4: center[1]+c//4]
+    #print("Shape After : ",mult.shape)
     inverse_img = np.abs(np.fft.ifft2(np.fft.ifftshift(mult)))
 
     if verbose:
@@ -103,14 +108,31 @@ def save_images(image, params, is_rgb=False):
     plt.figure()
     plt.title(title)
     if is_rgb:
-        plt.imsave(filename, image)
+        plt.imshow(image)
+        plt.colorbar()
+        plt.savefig(filename, bbox_inches="tight")
     else:
-        plt.imsave(filename, image, cmap="gray")
+        plt.imshow(image, cmap="gray")
+        plt.colorbar()
+        plt.savefig(filename,cmap="gray", bbox_inches="tight")
+
+def pad_image(image):
+    """Padd the input image to twice its size
+    :param image: input image
+    :output out : the double uniformly padded image
+    """
+    r,c = image.shape[:2]
+    out = np.zeros((2*r, 2*c))
+    for i in range(r):
+        for j in range(c):
+            out[2*i,2*j] = image[i,j]
+
+    return out
 
 def main(fname,D,types):
     kern = {"idealLP": idealFilterLP, "gaussLP": gaussianLP}
-    image = read_image(fname)
-
+    in_image = read_image(fname)
+    image = pad_image(in_image)
     r,c = image.shape[:2]
     for t in types:
         for d in D:
