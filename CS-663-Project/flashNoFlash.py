@@ -133,6 +133,19 @@ def calculate_mask(name,flash_image,noflash_image):
 
 
 
+def flash_adjust(flash_image, noflash_image, alpha):
+	
+	flash_image = cv2.cvtColor(flash_image,cv2.COLOR_BGR2YCR_CB)
+	noflash_image = cv2.cvtColor(noflash_image,cv2.COLOR_BGR2YCR_CB)
+	
+	adjust_img = np.zeros(noflash_image.shape).astype('double')
+	adjust_img = alpha*noflash_image + (1-alpha)*flash_image
+	adjust_img[adjust_img>255] = 255
+	adjust_img[adjust_img<0] = 0
+	adjust_img = adjust_img.astype(np.uint8)
+	adjust_img = cv2.cvtColor(adjust_img, cv2.COLOR_YCR_CB2RGB)
+	
+	return adjust_img
 
 
 if __name__=="__main__":
