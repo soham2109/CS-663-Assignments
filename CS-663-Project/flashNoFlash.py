@@ -2,13 +2,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from tqdm import tqdm
+from scipy.ndimage import convolve
+from skimage.morphology import disk
 
-def normalize(array):
+def gauss_ker(k, sig):
+	"""create a gaussian kernel with given size and standard deviation
+	;param k; the kernel size
+	:param sig: the standard deviation of the gaussian kernel
+	"""
+	x = np.linspace(-(k//2), (k//2), k)
+	gx, gy = np.meshgrid(x, x)
+	kernel = np.exp(-1*(gx**2 + gy**2)/(2*(sig**2)))
+	return kernel
+
+
+def _normalize(array):
 	"""Min-Max Normalization of the array
 	:param array: 2-D input image array
 	:output : returns normalized arrays
 	"""
 	return (array - np.min(array))/(np.max(array)-np.min(array))
+
+def normalize(array):
+	"""Divide the array by 
+	"""
+	return array/np.max(array)
 
 def bilateral(filename,input_image, sigma_spatial, sigma_intensity):
 	"""
@@ -20,7 +38,6 @@ def bilateral(filename,input_image, sigma_spatial, sigma_intensity):
 		   - sigma_intensity      (float)   value gaussian standard. deviation
 	outputs:-result      (ndarray) output bilateral-filtered image
 	"""
-
 	# make a simple Gaussian function taking the squared radius
 	gaussian = lambda r2, sigma: np.exp(-0.5*r2/sigma**2 )
 	#print(input_image.shape)
@@ -80,13 +97,13 @@ def joint_bilateral(filename,flash_image,noflash_image,sigma_spatial,sigma_inten
 				spatial = gaussian(shft_x**2+shft_y**2, sigma_spatial )
 	
 				# shift by the offsets to get image window
-				window = np.roll(norm_noflash_image, [shft_y, shft_x], axis=[0,1])
-	
+				window = np.roll(norm_flash_image, [shft_y, shft_x], axis=[0,1])
+				window1 = np.roll(norm_noflash_image, [shft_y, shft_x], axis=[0,1])
 				# compute the intensity contribution
-				combined_filter = spatial*gaussian( (window-norm_flash_image)**2, sigma_intensity )
+				combined_filter = spatial*gaussian((window-norm_flash_image)**2, sigma_intensity )
 	
 				# result stores the mult. between combined filter and image window
-				result[:,:,i] += window*combined_filter
+				result[:,:,i] += window1*combined_filter
 				wgt_sum[:,:,i] += combined_filter
 	out = normalize(result/wgt_sum)
 	# normalize the result and return
@@ -94,43 +111,49 @@ def joint_bilateral(filename,flash_image,noflash_image,sigma_spatial,sigma_inten
 	return out
 
 	
-def detail_transfer(name,flash_image,sigma_spatial,sigma_intensity):
-	eps = 0.02
-	flash_bilateral = bilateral(name,flash_image,sigma_spatial,sigma_intensity)
-	flash_image = cv2.cvtColor(flash_image,cv2.COLOR_BGR2RGB)
-	detail = (flash_image + eps)/(flash_bilateral + eps)
-	detail = normalize(detail)
+def detail_transfer(name,flash_image,flash_bilateral,eps=0.02):
+	# flash_bilateral = bilateral(name,flash_image,sigma_spatial,sigma_intensity)
+	flash_image = cv2.cvtColor(flash_image.astype(np.float32),cv2.COLOR_BGR2RGB)
+	detail = (normalize(flash_image) + eps)/(flash_bilateral + eps)
 	#avg_detail = (detail[:,:,0] + detail[:,:,1]+detail[:,:,2])/3
-	plt.imsave("outputImages/DetailLayer_"+name+"_" + str(sigma_spatial)+"_"+str(sigma_intensity)+".png",cv2.cvtColor(detail*255,cv2.COLOR_RGB2GRAY),cmap="gray")
+	plt.imsave("outputImages/DetailLayer_"+name+".png", _normalize(detail))
 	#plt.imsave("outputImages/DetailLayer_"+name+"_" + str(sigma_spatial)+"_"+str(sigma_intensity)+".png",avg_detail,cmap="gray")
-	
 	return detail
 
 def calculate_mask(name,flash_image,noflash_image):
 
-	flash_image = cv2.cvtColor(flash_image,cv2.COLOR_BGR2RGB)
-	noflash_image = cv2.cvtColor(noflash_image,cv2.COLOR_BGR2RGB)
-	
 	#luminance
-	Y_flash = 0.2126*flash_image[:,:,0] + 0.7152*flash_image[:,:,1] + 0.0722*flash_image[:,:,2]
-	Y_noflash = 0.2126*noflash_image[:,:,0] + 0.7152*noflash_image[:,:,1] + 0.0722*noflash_image[:,:,2]
+	Y_flash = cv2.cvtColor(flash_image,cv2.COLOR_BGR2GRAY)
+	Y_noflash = cv2.cvtColor(flash_image,cv2.COLOR_BGR2GRAY)
 
 	#shadow
 	diff_image = Y_flash - Y_noflash
-	shadow_mask = np.zeros_like(diff_image)
-	shadow_mask[diff_image<0.0] = 1
-
-	plt.imsave("outputImages/ShadowMask_"+name+ ".png",shadow_mask,cmap="gray")
+	shadow_mask = np.zeros(diff_image.shape, np.uint8)
 	
+	thr1 = -0.05
+	thr2 = -0.2 
+	shadow_mask[(diff_image > thr2) & (diff_image < thr1)] = 1
+	shadow_mask[(diff_image > 0.65) & (diff_image < 0.7)] = 1
+
 	#Specularity
-	max_flash = 0.95 * np.max(Y_noflash)
-	specularity_mask=np.zeros_like(diff_image)
-	specularity_mask[Y_flash>max_flash] = 1 
-	plt.imsave("outputImages/SpecularityMask_"+name+".png",specularity_mask,cmap="gray")
+	max_flash = 0.95 * (np.max(Y_flash) - np.min(Y_flash))
+	# shadow_mask=np.zeros_like(diff_image)
+	shadow_mask[Y_flash>max_flash] = 1 
+	
+	# dilation and erosion using circle elements
+	se1 = disk(2)
+	se2 = disk(6)
+	se3 = disk(4)
+	maskff = np.zeros((shadow_mask.shape[0]+2,shadow_mask.shape[1]+2), np.uint8)
+	shadow_mask = cv2.erode(shadow_mask, se1, iterations = 1)
+	cv2.floodFill(shadow_mask, maskff, (0,0), 1)
+	maskff = cv2.dilate(maskff, se2,  iterations = 1)
+	maskff = cv2.erode(maskff, se3, iterations = 1)
+	maskff = maskff.astype('double')
+	maskff = cv2.filter2D(maskff, -1, gauss_ker(3,3))
 
-	combined_mask = shadow_mask*specularity_mask
-	plt.imsave("outputImages/CombinedMask_"+name+".png",combined_mask,cmap="gray")	
-
+	plt.imsave("outputImages/CombinedMask_"+name+".png",maskff,cmap="gray")	
+	return maskff
 
 
 def flash_adjust(flash_image, noflash_image, alpha):
@@ -140,35 +163,37 @@ def flash_adjust(flash_image, noflash_image, alpha):
 	
 	adjust_img = np.zeros(noflash_image.shape).astype('double')
 	adjust_img = alpha*noflash_image + (1-alpha)*flash_image
-	adjust_img[adjust_img>255] = 255
-	adjust_img[adjust_img<0] = 0
+	
 	adjust_img = adjust_img.astype(np.uint8)
 	adjust_img = cv2.cvtColor(adjust_img, cv2.COLOR_YCR_CB2RGB)
 	
 	return adjust_img
 
+def remove_noise(name, noflash_bilateral, f_detail, joint_b, mask):
+    mask = mask[:-2,:-2]
+    final = np.dstack(((1-mask), (1-mask), (1-mask)))*(joint_b*f_detail) + np.dstack((mask, mask, mask))*(noflash_bilateral)
+    plt.imsave("outputImages/NoiseRemoved_"+name+".png",final)
+    return final
 
 if __name__=="__main__":
-	input_filename_noflash = "flash_data_JBF_Detail_transfer/cave01_01_noflash.tif"
-	input_filename_flash = "flash_data_JBF_Detail_transfer/cave01_00_flash.tif"
-	image_noflash = cv2.imread(input_filename_noflash)
-	image_flash = cv2.imread(input_filename_flash)
+	input_filename_noflash = "flash_data_JBF_Detail_transfer/potsdetail_00_flash.tif"
+	input_filename_flash = "flash_data_JBF_Detail_transfer/potsdetail_01_noflash.tif"
+	
+	name = input_filename_noflash.split("/")[-1].split("_")[0]
+
+	noflash_image = cv2.imread(input_filename_noflash)
+	flash_image = cv2.imread(input_filename_flash)
 	#image_noflash = cv2.resize(image_noflash,(100,100),interpolation = cv2.INTER_AREA)
 	#image_flash = cv2.resize(image_flash,(100,100),interpolation = cv2.INTER_AREA)
 	
-	print(image_noflash.shape)
-	print(image_flash.shape)
-	
-	mid_pix = (image_noflash.shape[0]//2,image_noflash.shape[1]//2)
+		
+	bilateral_flash = bilateral(name+"flash",flash_image,3,0.06)
+	bilateral_noflash = bilateral(name+'no_flash',noflash_image,3,0.06)
+	joint_bilateral_out = joint_bilateral(name, flash_image, noflash_image,3, 0.06)
 
-	#image = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-	name = input_filename_noflash.split("/")[-1].split(".")[0]
-	#filter_bilateral(name,np.array(image,dtype=np.float64),6,0.1)
-	#detail_out = detail_transfer(name,image_flash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:],3,0.1)
-	#jointBilateral_out = joint_bilateral(name,image_flash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:],image_noflash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:],3,0.1)
-	#bilateral_out = bilateral(name,image_noflash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:],3,0.1)
-	#diff_Bilateral_JointBilateral = np.array(jointBilateral_out - bilateral_out,dtype=np.uint8)
-	#diff_Bilateral_JointBilateral = np.array(jointBilateral_out - bilateral_out).astype(np.uint8)
-	#plt.imsave("outputImages/Diff_Bilateral_JointBilateral_"+name+"_" + str(3)+"_"+str(0.1)+".png",diff_Bilateral_JointBilateral)
-	calculate_mask(name,image_flash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:],image_noflash[mid_pix[0]-500:mid_pix[0]+500,mid_pix[1]-500:mid_pix[1]+500,:])
+	mask = calculate_mask(name, flash_image, noflash_image)
+	f_detail = detail_transfer(name,flash_image,bilateral_flash,0.02)
 
+	final = remove_noise(name, bilateral_noflash, f_detail, joint_bilateral_out, mask)
+	without_mask = f_detail*joint_bilateral_out
+	plt.imsave("outputImages/Without_Mask_"+name+".png",_normalize(without_mask))
