@@ -69,12 +69,15 @@ def bilateral(filename,input_image, sigma_spatial, sigma_intensity):
 	out = normalize(result/wgt_sum)
 
 	# normalize the result and return
-	plt.imsave("outputImages/Bilateral_"+filename+"_"+str(sigma_spatial)+"_"+ str(sigma_intensity) + ".png" ,out)
+	plt.imsave("outputImages/Bilateral_"+filename+"_"+str(sigma_spatial)+"_"+ str(sigma_intensity) + ".png" ,out,dpi=600)
 	return out
 	
 	
 	
 def joint_bilateral(filename,flash_image,noflash_image,sigma_spatial,sigma_intensity):
+	"""Joint Bilateral filter taking spatial gaussian from noFlash and intensity gaussian from flash image
+	:param filename: a file name to save the joint bilateral
+	"""
 	# make a simple Gaussian function taking the squared radius
 	gaussian = lambda r2, sigma: np.exp(-0.5*r2/sigma**2)
 	flash_image = cv2.cvtColor(flash_image,cv2.COLOR_BGR2RGB)
@@ -107,7 +110,7 @@ def joint_bilateral(filename,flash_image,noflash_image,sigma_spatial,sigma_inten
 				wgt_sum[:,:,i] += combined_filter
 	out = normalize(result/wgt_sum)
 	# normalize the result and return
-	plt.imsave("outputImages/JointBilateral_"+filename+"_"+str(sigma_spatial)+"_"+ str(sigma_intensity) + ".png" ,out)
+	plt.imsave("outputImages/JointBilateral_"+filename+"_"+str(sigma_spatial)+"_"+ str(sigma_intensity) + ".png" ,out,dpi=600)
 	return out
 
 	
@@ -116,7 +119,7 @@ def detail_transfer(name,flash_image,flash_bilateral,eps=0.02):
 	flash_image = cv2.cvtColor(flash_image.astype(np.float32),cv2.COLOR_BGR2RGB)
 	detail = (normalize(flash_image) + eps)/(flash_bilateral + eps)
 	#avg_detail = (detail[:,:,0] + detail[:,:,1]+detail[:,:,2])/3
-	plt.imsave("outputImages/DetailLayer_"+name+".png", _normalize(detail))
+	plt.imsave("outputImages/DetailLayer_"+name+".png", _normalize(detail),dpi=600)
 	#plt.imsave("outputImages/DetailLayer_"+name+"_" + str(sigma_spatial)+"_"+str(sigma_intensity)+".png",avg_detail,cmap="gray")
 	return detail
 
@@ -152,7 +155,7 @@ def calculate_mask(name,flash_image,noflash_image):
 	maskff = maskff.astype('double')
 	maskff = cv2.filter2D(maskff, -1, gauss_ker(3,3))
 
-	plt.imsave("outputImages/CombinedMask_"+name+".png",maskff,cmap="gray")	
+	plt.imsave("outputImages/CombinedMask_"+name+".png",maskff,cmap="gray",dpi=600)	
 	return maskff
 
 
@@ -162,7 +165,7 @@ def flash_adjust(flash_image, noflash_image, alpha):
 	noflash_image = cv2.cvtColor(noflash_image,cv2.COLOR_BGR2YCR_CB)
 	
 	adjust_img = np.zeros(noflash_image.shape).astype('double')
-	adjust_img = alpha*noflash_image + (1-alpha)*flash_image
+	adjust_img = alpha*flash_image + (1-alpha)*noflash_image
 	
 	adjust_img = adjust_img.astype(np.uint8)
 	adjust_img = cv2.cvtColor(adjust_img, cv2.COLOR_YCR_CB2RGB)
@@ -172,13 +175,28 @@ def flash_adjust(flash_image, noflash_image, alpha):
 def remove_noise(name, noflash_bilateral, f_detail, joint_b, mask):
     mask = mask[:-2,:-2]
     final = np.dstack(((1-mask), (1-mask), (1-mask)))*(joint_b*f_detail) + np.dstack((mask, mask, mask))*(noflash_bilateral)
-    plt.imsave("outputImages/NoiseRemoved_"+name+".png",final)
+    plt.figure()
+    plt.imshow("outputImages/NoiseRemoved_"+name+".png",final)
+    plt.axis("off")
+    plt.savefig("outputImages/NoiseRemoved_"+name+".png", bbox_inches='tight', dpi=600)
+    # cv2.imwrite("outputImages/NoiseRemoved_"+name+".png",final)
     return final
 
+
+def white_balancing(flash_image, noflash_image, ):
+	if opt==1:
+		scaling=(255/246,255/169,255/87)
+	else:
+		pass
+	pass
+
 if __name__=="__main__":
-	input_filename_noflash = "flash_data_JBF_Detail_transfer/potsdetail_00_flash.tif"
-	input_filename_flash = "flash_data_JBF_Detail_transfer/potsdetail_01_noflash.tif"
+	input_filename_flash = "flash_data_JBF_Detail_transfer/potsdetail_00_flash.tif"
+	input_filename_noflash = "flash_data_JBF_Detail_transfer/potsdetail_01_noflash.tif"
 	
+	# input_filename_flash = "flash_data_JBF_Detail_transfer/lamp_00_flash.tif"
+	# input_filename_noflash = "flash_data_JBF_Detail_transfer/lamp_01_noflash.tif"
+
 	name = input_filename_noflash.split("/")[-1].split("_")[0]
 
 	noflash_image = cv2.imread(input_filename_noflash)
